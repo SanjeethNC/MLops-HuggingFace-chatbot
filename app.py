@@ -42,21 +42,73 @@ def respond(
 """
 For information on how to customize the ChatInterface, peruse the gradio docs: https://www.gradio.app/docs/chatinterface
 """
+import gradio as gr
+
+# Respond function (you can customize it as per your use case)
+def respond(message):
+    # Example response logic, modify this as needed
+    return "You said: " + message
+
+# Custom CSS for enhancing the UI look
+css = """
+#chatbox {
+    background-color: #f7f7f7;
+    border-radius: 15px;
+}
+#submit {
+    background-color: #4CAF50;
+    color: white;
+    font-weight: bold;
+}
+#reset {
+    background-color: #f44336;
+    color: white;
+    font-weight: bold;
+}
+.gradio-container {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+"""
+
+# Interface with multiple customizable settings
 demo = gr.ChatInterface(
     respond,
     additional_inputs=[
-        gr.Textbox(value="You are a friendly Chatbot.", label="System message"),
+        gr.Textbox(value="You are a friendly Chatbot.", label="System message", placeholder="Set system behavior here..."),
         gr.Slider(minimum=1, maximum=2048, value=512, step=1, label="Max new tokens"),
         gr.Slider(minimum=0.1, maximum=4.0, value=0.7, step=0.1, label="Temperature"),
-        gr.Slider(
-            minimum=0.1,
-            maximum=1.0,
-            value=0.95,
-            step=0.05,
-            label="Top-p (nucleus sampling)",
-        ),
+        gr.Slider(minimum=0.1, maximum=1.0, value=0.95, step=0.05, label="Top-p (nucleus sampling)"),
+        gr.Checkbox(value=True, label="Enable Markdown formatting"),
+        gr.File(label="Upload chat history", type="file"),
     ],
+    theme="soft",
+    title="My Cool Chatbot",
+    description="A chatbot interface with modern features.",
+    reset_on_submit=True,
+    live=True,
 )
+
+# Additional Gradio components for enhancing the UI
+with gr.Blocks(css=css) as interface:
+    gr.Markdown(
+        """
+        # Welcome to the Cool Chatbot! 
+        Let's have a friendly chat, and feel free to tweak the settings on the left to improve our conversation!
+        """
+    )
+    
+    with gr.Row():
+        with gr.Column(scale=3):
+            demo.launch()
+        with gr.Column(scale=1):
+            gr.Button("Reset Conversation", id="reset")
+
+# Launch the app with the custom layout
+interface.launch()
+
 
 
 if __name__ == "__main__":
