@@ -1,7 +1,7 @@
 import gradio as gr
 from huggingface_hub import InferenceClient
 
-# Hugging Face Inference API client initialization
+# Initialize Hugging Face Inference API client
 client = InferenceClient("HuggingFaceH4/zephyr-7b-beta")
 
 def respond(
@@ -11,6 +11,8 @@ def respond(
     max_tokens,
     temperature,
     top_p,
+    *args,  # To catch additional arguments that may be passed
+    **kwargs  # Catch any other keyword arguments Gradio may pass
 ):
     # Construct the conversation history including system message
     messages = [{"role": "system", "content": system_message}]
@@ -19,10 +21,12 @@ def respond(
             messages.append({"role": "user", "content": user_msg})
         if bot_msg:
             messages.append({"role": "assistant", "content": bot_msg})
+    
+    # Add the latest user message to the conversation
     messages.append({"role": "user", "content": message})
 
-    # Generate response from model with streaming
     response = ""
+    # Stream the response from the model
     for token_response in client.chat_completion(
         messages, max_tokens=max_tokens, stream=True, temperature=temperature, top_p=top_p
     ):
@@ -30,11 +34,7 @@ def respond(
         response += token
         yield response
 
-# Function to reset chat history
-def reset_chat():
-    return "", []
-
-# Custom CSS for modern UI styling
+# Custom CSS for better UI appearance
 custom_css = """
 #submit {
     background-color: #4CAF50;
@@ -55,11 +55,11 @@ custom_css = """
 }
 """
 
-# Build the enhanced chatbot interface
+# Interface setup with chat input, sliders, and file upload
 demo = gr.ChatInterface(
     respond,
     additional_inputs=[
-        gr.Textbox(value="You are a friendly Chatbot.", label="System message", placeholder="Set the chatbot's system behavior."),
+        gr.Textbox(value="You are a friendly Chatbot.", label="System message"),
         gr.Slider(minimum=1, maximum=2048, value=512, step=1, label="Max new tokens"),
         gr.Slider(minimum=0.1, maximum=4.0, value=0.7, step=0.1, label="Temperature"),
         gr.Slider(minimum=0.1, maximum=1.0, value=0.95, step=0.05, label="Top-p (nucleus sampling)"),
@@ -71,20 +71,6 @@ demo = gr.ChatInterface(
     description="A chatbot interface with advanced features and modern design.",
 )
 
-# Additional interface components (Reset, Save Chat, etc.)
-with gr.Blocks(css=custom_css) as interface:
-    gr.Markdown("# Welcome to the Enhanced Chatbot! 🌟")
-    gr.Markdown("This chatbot comes with additional features like chat reset, chat history upload, and markdown support. Try adjusting the settings to enhance the conversation!")
-    
-    with gr.Row():
-        with gr.Column(scale=3):
-            demo.launch()
-        with gr.Column(scale=1):
-            reset_button = gr.Button("Reset Conversation", id="reset")
-            reset_button.click(fn=reset_chat, inputs=[], outputs=[demo])
-
-# Launch the interface with the custom layout
-interface.launch()
-
+# Launch the demo with the option to share a public link
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(share=True)
