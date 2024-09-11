@@ -39,9 +39,10 @@ def respond(
         response += token
         yield response
 
-"""
-For information on how to customize the ChatInterface, peruse the gradio docs: https://www.gradio.app/docs/chatinterface
-"""
+
+def reset_chat():
+    return "", []  # Reset the input message and chat history
+
 
 # Custom CSS for enhancing the UI look
 css = """
@@ -81,7 +82,6 @@ demo = gr.ChatInterface(
     theme="soft",
     title="My Cool Chatbot",
     description="A chatbot interface with modern features.",
-    reset_on_submit=True,
     live=True,
 )
 
@@ -98,12 +98,11 @@ with gr.Blocks(css=css) as interface:
         with gr.Column(scale=3):
             demo.launch()
         with gr.Column(scale=1):
-            gr.Button("Reset Conversation", id="reset")
+            reset_button = gr.Button("Reset Conversation", id="reset")
+            reset_button.click(fn=reset_chat, inputs=[], outputs=[demo])
 
 # Launch the app with the custom layout
 interface.launch()
-
-
 
 if __name__ == "__main__":
     demo.launch()
