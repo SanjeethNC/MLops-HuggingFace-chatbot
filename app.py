@@ -42,12 +42,6 @@ def respond(
 """
 For information on how to customize the ChatInterface, peruse the gradio docs: https://www.gradio.app/docs/chatinterface
 """
-import gradio as gr
-
-# Respond function (you can customize it as per your use case)
-def respond(message):
-    # Example response logic, modify this as needed
-    return "You said: " + message
 
 # Custom CSS for enhancing the UI look
 css = """
@@ -82,7 +76,7 @@ demo = gr.ChatInterface(
         gr.Slider(minimum=0.1, maximum=4.0, value=0.7, step=0.1, label="Temperature"),
         gr.Slider(minimum=0.1, maximum=1.0, value=0.95, step=0.05, label="Top-p (nucleus sampling)"),
         gr.Checkbox(value=True, label="Enable Markdown formatting"),
-        gr.File(label="Upload chat history", type="file"),
+        gr.File(label="Upload chat history", type="filepath"),  # Corrected the type to "filepath"
     ],
     theme="soft",
     title="My Cool Chatbot",
