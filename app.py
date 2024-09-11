@@ -4,6 +4,7 @@ from huggingface_hub import InferenceClient
 # Initialize Hugging Face Inference API client
 client = InferenceClient("HuggingFaceH4/zephyr-7b-beta")
 print("asjaj")
+print('abc')
 
 def respond(
     message,
